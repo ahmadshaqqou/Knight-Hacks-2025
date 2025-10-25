@@ -16,6 +16,7 @@ proto-plus==1.26.1
 protobuf==6.33.0
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
+pymongo==4.15.3
 pyparsing==3.2.5
 python-dotenv==1.0.0
 requests==2.32.5

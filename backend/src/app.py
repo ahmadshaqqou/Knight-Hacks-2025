@@ -20,6 +20,7 @@ load_dotenv()
 
 # No security
 os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(24)
@@ -157,4 +158,4 @@ def verify_token():
         return jsonify({"valid": False, "error": str(e)}), 401
 
 if __name__ == '__main__':
-    app.run(debug=True, port=6767)
+    app.run(debug=True, host='0.0.0.0', port=6767)
