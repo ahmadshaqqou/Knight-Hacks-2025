@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  body {
+    @apply bg-neutral-lightest text-neutral-darkest font-sans;
+  }
+  
+  h1 {
+    @apply text-3xl font-bold mb-4 text-law-navy;
+  }
+  
+  h2 {
+    @apply text-2xl font-bold mb-3 text-law-navy;
+  }
+  
+  h3 {
+    @apply text-xl font-bold mb-2 text-law-navy;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-all duration-300;
+  }
+  
+  .btn-primary {
+    @apply bg-law-navy text-white hover:bg-law-blue shadow-sm hover:shadow-md;
+  }
+  
+  .btn-secondary {
+    @apply bg-neutral-dark text-white hover:bg-neutral shadow-sm hover:shadow-md;
+  }
+  
+  .btn-outline {
+    @apply border border-law-navy text-law-navy hover:bg-law-navy hover:text-white;
+  }
+  
+  .card {
+    @apply bg-white rounded-md shadow-sm p-6 transition-all duration-300 border border-neutral-light;
+  }
+  
+  .input {
+    @apply w-full px-4 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-2 focus:ring-law-blue focus:border-transparent;
+  }
+  
+  .textarea {
+    @apply w-full px-4 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-2 focus:ring-law-blue focus:border-transparent;
+  }
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInFromRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(0, 120, 255, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(0, 120, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 120, 255, 0); }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+  
+  .animate-slide-in {
+    animation: slideInFromRight 0.5s ease-out forwards;
+  }
+  
+  .animate-pulse-blue {
+    animation: pulse 2s infinite;
+  }
+  
+  .transition-all-slow {
+    transition: all 0.5s ease;
+  }
+  
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+}
