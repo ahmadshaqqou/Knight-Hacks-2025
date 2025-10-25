@@ -1,1 +1,5 @@
 .env
+.venv/
+
+#google calendar api
+credentials.json
