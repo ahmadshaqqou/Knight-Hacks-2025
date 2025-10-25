@@ -1,9 +1,7 @@
 .env
-<<<<<<< HEAD
 .venv/
 
 #google calendar api
 credentials.json
-=======
+token.json
 __pycache__
->>>>>>> 3f3adbd2f2b6f8989cfa7ce78e2e34c5d55f0b0e

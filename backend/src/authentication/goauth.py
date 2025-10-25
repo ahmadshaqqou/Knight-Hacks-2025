@@ -6,8 +6,15 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
-SCOPES = ["https://www.googleapis.com/auth/calendar"]
+SCOPES = [
+    "https://www.googleapis.com/auth/calendar",
+    "openid",
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+]
 
 def main():
     creds = None
@@ -29,7 +36,12 @@ def main():
                 prompt="consent"
             )
 
-        #saves the new creds into this file
+            if creds.id_token:
+                id_info = id_token.verify_oauth2_token(creds.id_token, requests.Request())
+                print("User email:", id_info.get("email"))
+                print("Email verified:", id_info.get("email_verified"))        
+
+                #saves the new creds into this file
         with open("token.json", "w") as token:
             token.write(creds.to_json())
 
