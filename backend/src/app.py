@@ -123,6 +123,13 @@ def get_user():
         return jsonify(user)
     return jsonify({"error": "Not authenticated"}), 401
 
+# @app.route('/api/auth/credentials')
+def get_credentials():
+    credentials = session.get('credentials')
+    if credentials:
+        return credentials
+    return None
+
 @app.route('/api/auth/verify-token', methods=['POST'])
 def verify_token():
     data = request.get_json()
