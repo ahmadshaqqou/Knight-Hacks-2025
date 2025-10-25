@@ -1,32 +1,21 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
-interface LoginProps {
-  onLogin?: () => void;
-}
-
-const Login: React.FC<LoginProps> = ({ onLogin }) => {
+const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleGoogleLogin = async () => {
-    setIsLoading(true);
-    setError('');
-    
-    // Simulate Google OAuth API call
-    setTimeout(() => {
-      // For demo purposes, simulate successful Google login
+    try {
+      setIsLoading(true);
+      setError('');
+      login();
+    } catch (err) {
+      setError('Failed to login with Google. Please try again.');
       setIsLoading(false);
-      
-      // Call the onLogin callback if provided
-      if (onLogin) {
-        onLogin();
-      }
-      
-      navigate('/');
-    }, 1500);
+    }
   };
 
   return (

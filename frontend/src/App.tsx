@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home/Home';
 import TaskHistoryPage from './pages/TaskHistory/TaskHistory';
@@ -6,19 +6,24 @@ import Login from './pages/Login/Login';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
-function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  
-  // For demo purposes, we'll authenticate the user when they log in
-  // In a real app, this would be handled by a proper auth system with tokens
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-  };
+const AppContent = () => {
+  const { isAuthenticated, isLoading, logout } = useAuth();
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-  };
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white via-neutral-lightest to-white">
+        <div className="text-center">
+          <svg className="animate-spin h-12 w-12 text-law-navy mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p className="text-neutral-dark">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Routes>
@@ -28,7 +33,7 @@ function App() {
         element={
           isAuthenticated ?
             <Navigate to="/" replace /> :
-            <Login onLogin={handleLogin} />
+            <Login />
         }
       />
       
@@ -41,7 +46,7 @@ function App() {
               <div className="absolute inset-0 bg-grid-pattern opacity-20 pointer-events-none"></div>
               <Header
                 isAuthenticated={isAuthenticated}
-                onLogout={handleLogout}
+                onLogout={logout}
               />
               <main className="flex-grow container mx-auto px-4 py-8 relative z-10">
                 <Routes>
@@ -56,6 +61,14 @@ function App() {
         }
       />
     </Routes>
+  );
+};
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

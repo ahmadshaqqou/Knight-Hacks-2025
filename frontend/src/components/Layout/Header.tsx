@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface HeaderProps {
   isAuthenticated?: boolean;
@@ -8,6 +9,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ isAuthenticated = false, onLogout }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   
   const handleAuthAction = () => {
     if (isAuthenticated && onLogout) {
@@ -57,6 +59,20 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated = false, onLogout }) =>
               </Link>
             </li>
             <li>
+              {isAuthenticated && user && (
+                <div className="mr-4 text-white text-sm flex items-center">
+                  {user.picture && (
+                    <img
+                      src={user.picture}
+                      alt={user.name}
+                      className="w-6 h-6 rounded-full mr-2 border border-white"
+                    />
+                  )}
+                  <span className="hidden sm:inline">{user.name}</span>
+                </div>
+              )}
+            </li>
+            <li>
               <button
                 onClick={handleAuthAction}
                 className="ml-2 bg-white text-law-navy hover:bg-law-cream transition-colors duration-200 font-medium px-4 py-2 rounded-md flex items-center text-sm"
@@ -73,7 +89,7 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated = false, onLogout }) =>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                     </svg>
-                    Sign In
+                    Sign In with Google
                   </>
                 )}
               </button>
