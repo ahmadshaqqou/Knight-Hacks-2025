@@ -11,74 +11,70 @@ interface AnalysisResultProps {
 }
 
 const AnalysisResults: React.FC<AnalysisResultProps> = ({ result }) => {
-  const getConfidenceColor = (confidence: number | undefined) => {
-    if (!confidence) return 'bg-neutral-light';
-    
-    if (confidence >= 0.8) {
-      return 'bg-green-100 text-green-800';
-    } else if (confidence >= 0.5) {
-      return 'bg-yellow-100 text-yellow-800';
-    } else {
-      return 'bg-red-100 text-red-800';
-    }
-  };
-
-  const formatConfidence = (confidence: number | undefined) => {
-    if (confidence === undefined) return 'Unknown';
-    return `${Math.round(confidence * 100)}%`;
-  };
-
   const getSpecialistIcon = (specialist: string | undefined) => {
-    if (!specialist) return null;
-    
     switch (specialist) {
-      case 'Legal Researcher':
+      case 'Records Wrangler':
         return (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-law-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
         );
       case 'Client Communication Guru':
         return (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-law-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+        );
+      case 'Legal Researcher':
+        return (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         );
       case 'Voice Bot Scheduler':
         return (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-law-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         );
       case 'Evidence Sorter':
         return (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-law-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
         );
       default:
         return (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-law-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-neutral" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
           </svg>
         );
     }
   };
 
+  const getConfidenceColor = (confidence: number | undefined) => {
+    if (!confidence) return 'bg-neutral';
+    
+    if (confidence >= 0.9) return 'bg-green-500';
+    if (confidence >= 0.7) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
+  const formatConfidence = (confidence: number | undefined) => {
+    if (!confidence) return '0%';
+    return `${Math.round(confidence * 100)}%`;
+  };
+
   if (!result.taskDetected) {
     return (
-      <div className="card border-l-4 border-yellow-400 shadow-card bg-white bg-opacity-90">
-        <div className="flex items-start">
-          <div className="flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-          </div>
-          <div className="ml-3">
-            <h3 className="text-lg font-medium text-yellow-800">No Task Detected</h3>
-            <p className="mt-1 text-sm text-neutral-dark">
-              No actionable task was detected in the provided content. Please try again with different content or provide more context.
-            </p>
+      <div className="card shadow-card hover:shadow-card-hover transition-shadow duration-300 border-t-4 border-neutral bg-white bg-opacity-90 p-6">
+        <div className="flex items-center justify-center py-6">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-neutral" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div className="ml-4">
+            <h3 className="text-xl font-semibold text-neutral-dark">No Task Detected</h3>
+            <p className="text-neutral">The AI couldn't identify an actionable task in the provided content.</p>
           </div>
         </div>
       </div>
@@ -86,41 +82,39 @@ const AnalysisResults: React.FC<AnalysisResultProps> = ({ result }) => {
   }
 
   return (
-    <div className="card border-t-4 border-law-blue shadow-card bg-white bg-opacity-90">
-      <h3 className="text-xl font-semibold mb-4 text-law-navy flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-law-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+    <div className="card shadow-card hover:shadow-card-hover transition-shadow duration-300 border-t-4 border-law-navy bg-white bg-opacity-90">
+      <h2 className="text-xl font-semibold mb-6 text-law-navy flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
         </svg>
         Analysis Results
-      </h3>
+      </h2>
       
       <div className="space-y-6">
-        <div className="bg-neutral-lightest p-4 rounded-lg border border-neutral-light">
-          <h4 className="text-sm font-medium text-neutral mb-2">Task Detected</h4>
+        <div className="bg-neutral-lightest p-4 rounded-lg">
+          <h3 className="text-sm uppercase tracking-wider text-neutral font-medium mb-2">Detected Task</h3>
           <p className="text-lg font-medium text-law-navy">{result.taskDescription}</p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-neutral-lightest p-4 rounded-lg border border-neutral-light">
-            <h4 className="text-sm font-medium text-neutral mb-2">Confidence</h4>
+        <div className="flex flex-wrap gap-4">
+          <div className="flex-1 min-w-[200px] bg-neutral-lightest p-4 rounded-lg">
+            <h3 className="text-sm uppercase tracking-wider text-neutral font-medium mb-2">AI Confidence</h3>
             <div className="flex items-center">
               <div className="w-full bg-neutral-light rounded-full h-2.5 mr-2">
-                <div
-                  className="bg-law-blue h-2.5 rounded-full"
+                <div 
+                  className={`h-2.5 rounded-full ${getConfidenceColor(result.confidence)}`} 
                   style={{ width: formatConfidence(result.confidence) }}
                 ></div>
               </div>
-              <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getConfidenceColor(result.confidence)}`}>
-                {formatConfidence(result.confidence)}
-              </span>
+              <span className="text-sm font-medium text-law-navy">{formatConfidence(result.confidence)}</span>
             </div>
           </div>
           
-          <div className="bg-neutral-lightest p-4 rounded-lg border border-neutral-light">
-            <h4 className="text-sm font-medium text-neutral mb-2">Specialist</h4>
+          <div className="flex-1 min-w-[200px] bg-neutral-lightest p-4 rounded-lg">
+            <h3 className="text-sm uppercase tracking-wider text-neutral font-medium mb-2">Routed To</h3>
             <div className="flex items-center">
               {getSpecialistIcon(result.specialist)}
-              <p className="font-medium text-law-navy">{result.specialist}</p>
+              <span className="ml-2 text-law-navy font-medium">{result.specialist}</span>
             </div>
           </div>
         </div>

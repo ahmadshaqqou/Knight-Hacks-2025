@@ -3,6 +3,7 @@ import TextInput from '../../components/TextInput/TextInput';
 import FileUpload from '../../components/FileUpload/FileUpload';
 import AnalysisResults from '../../components/AnalysisResults/AnalysisResults';
 import HumanApproval from '../../components/HumanApproval/HumanApproval';
+import CreateCase from '../../components/CreateCase/CreateCase';
 
 interface AnalysisResult {
   taskDetected: boolean;
@@ -12,11 +13,20 @@ interface AnalysisResult {
   id?: string;
 }
 
+interface CaseData {
+  id: string;
+  name: string;
+  caseNumber?: string;
+  summary: string;
+  createdAt: Date;
+}
+
 const Home: React.FC = () => {
   const [text, setText] = useState<string>('');
   const [files, setFiles] = useState<File[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [cases, setCases] = useState<CaseData[]>([]);
 
   const handleTextChange = (newText: string) => {
     setText(newText);
@@ -67,13 +77,23 @@ const Home: React.FC = () => {
     setAnalysisResult(null);
   };
 
+  const handleCaseCreated = (caseData: CaseData) => {
+    setCases([...cases, caseData]);
+    // In a real application, we would save this to the database
+    console.log('New case created:', caseData);
+  };
+
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="text-center mb-10">
+      <div className="text-center mb-6">
         <h1 className="text-4xl font-bold mb-3 text-law-navy">Tender for Lawyers</h1>
         <p className="text-lg text-neutral-dark max-w-2xl mx-auto">
           AI-powered assistant for legal teams. Upload messy content and let our AI specialists organize and route your tasks.
         </p>
+      </div>
+      
+      <div className="flex justify-end mb-6">
+        <CreateCase onCaseCreated={handleCaseCreated} />
       </div>
       
       <div className="card mb-8 shadow-card hover:shadow-card-hover transition-shadow duration-300 border-t-4 border-law-navy bg-white bg-opacity-90">
