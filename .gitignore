@@ -1,3 +1,8 @@
 .env
+.venv/
+
+#google calendar api
+credentials.json
+token.json
 __pycache__
 node_modules
