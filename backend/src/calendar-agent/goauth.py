@@ -21,10 +21,13 @@ def main():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                "credentials.json", SCOPES 
+            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+
+            creds = flow.run_local_server(
+                port=8080,
+                access_type="offline",
+                prompt="consent"
             )
-        creds = flow.run_local_server(port=8080)
 
         #saves the new creds into this file
         with open("token.json", "w") as token:
@@ -33,7 +36,7 @@ def main():
     try:
         service = build("calendar", "v3", credentials=creds)
 
-        now = dt.datetime.now(tz=dt.timezone.utc).isoformat() + "Z"
+        now = dt.datetime.now(tz=dt.timezone.utc).isoformat()
 
         events_result = (
             service.events()
@@ -43,8 +46,8 @@ def main():
                     maxResults=10,
                     singleEvents=True,
                     orderBy="startTime",
-            )
-            .execute()
+                )
+                .execute()
         )
         events = events_result.get("items", [])
 
@@ -57,7 +60,7 @@ def main():
             print(start, event["summary"])
     
     except HttpError as error:
-        print(f"An error occured: {error}")
+        print(f"An error occurred: {error}")
 
 if __name__ == "__main__":
     main()
