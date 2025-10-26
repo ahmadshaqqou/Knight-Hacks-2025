@@ -4,7 +4,7 @@ import FileUpload from '../../components/FileUpload/FileUpload';
 import AnalysisResults from '../../components/AnalysisResults/AnalysisResults';
 import HumanApproval from '../../components/HumanApproval/HumanApproval';
 import CreateCase from '../../components/CreateCase/CreateCase';
-import { ocrAPI } from '../../services/api';
+import { casesAPI, ocrAPI } from '../../services/api';
 
 interface AnalysisResult {
   taskDetected: boolean;
@@ -14,12 +14,12 @@ interface AnalysisResult {
   id?: string;
 }
 
-interface CaseData {
-  id: string;
-  name: string;
-  caseNumber?: string;
-  summary: string;
-  createdAt: Date;
+export interface CaseData {
+  _id: string;
+  case_name: string;
+  case_summary: string;
+  client_name: string;
+  client_email: string;
 }
 
 const Home: React.FC = () => {
@@ -35,11 +35,11 @@ const Home: React.FC = () => {
   };
 
   const handleFileUpload = async (uploadedFiles: File[]) => {
-    const newFiles = [...uploadedFiles];
-    setFiles([...files, ...newFiles]);
+    // Replace the files array with the new files instead of appending
+    setFiles(uploadedFiles);
     
     // Check if any of the uploaded files are PDFs
-    const pdfFiles = newFiles.filter(file => file.type === 'application/pdf');
+    const pdfFiles = uploadedFiles.filter((file: File) => file.type === 'application/pdf');
     
     if (pdfFiles.length > 0) {
       setIsProcessingOCR(true);
@@ -47,21 +47,63 @@ const Home: React.FC = () => {
       try {
         // Process each PDF file with OCR
         for (const pdfFile of pdfFiles) {
-          const response = await ocrAPI.extractTextFromPDF(pdfFile);
-          const extractedText = response.data.text;
+          console.log(`Processing PDF file: ${pdfFile.name}`);
           
-          if (extractedText && extractedText.trim()) {
-            // Append the extracted text to the text input
+          try {
+            const response = await ocrAPI.extractTextFromPDF(pdfFile);
+            console.log('OCR response:', response);
+            
+            if (response.data && response.data.success) {
+              const extractedText = response.data.text;
+              
+              if (extractedText && extractedText.trim()) {
+                console.log(`Extracted ${extractedText.length} characters of text`);
+                
+                // Append the extracted text to the text input
+                setText(prevText => {
+                  const newText = prevText ?
+                    `${prevText}\n\n--- Extracted from ${pdfFile.name} ---\n${extractedText}` :
+                    `--- Extracted from ${pdfFile.name} ---\n${extractedText}`;
+                  return newText;
+                });
+              } else {
+                console.log('No text extracted from PDF');
+                
+                // Notify the user that no text was extracted
+                setText(prevText => {
+                  const newText = prevText ?
+                    `${prevText}\n\n--- No text could be extracted from ${pdfFile.name} ---` :
+                    `--- No text could be extracted from ${pdfFile.name} ---`;
+                  return newText;
+                });
+              }
+            } else {
+              console.error('OCR processing failed:', response.data?.error || 'Unknown error');
+              
+              // Notify the user of the error
+              setText(prevText => {
+                const newText = prevText ?
+                  `${prevText}\n\n--- Error processing ${pdfFile.name}: ${response.data?.error || 'Unknown error'} ---` :
+                  `--- Error processing ${pdfFile.name}: ${response.data?.error || 'Unknown error'} ---`;
+                return newText;
+              });
+            }
+          } catch (fileError: any) {
+            console.error(`Error processing ${pdfFile.name}:`, fileError);
+            
+            // Notify the user of the error
             setText(prevText => {
-              const newText = prevText ? `${prevText}\n\n--- Extracted from ${pdfFile.name} ---\n${extractedText}` :
-                `--- Extracted from ${pdfFile.name} ---\n${extractedText}`;
+              const errorMessage = fileError?.message || 'Unknown error';
+              const newText = prevText ?
+                `${prevText}\n\n--- Error processing ${pdfFile.name}: ${errorMessage} ---` :
+                `--- Error processing ${pdfFile.name}: ${errorMessage} ---`;
               return newText;
             });
           }
         }
-      } catch (error) {
-        console.error('Error processing PDF with OCR:', error);
-        // You could add error handling UI here
+      } catch (error: any) {
+        console.error('Error in OCR processing:', error);
+        alert(`Error processing PDF files: ${error?.message || 'Unknown error'}`);
       } finally {
         setIsProcessingOCR(false);
       }
@@ -76,20 +118,63 @@ const Home: React.FC = () => {
 
     setIsAnalyzing(true);
 
-    // Simulate API call to backend
-    setTimeout(() => {
-      // Mock response
-      const mockResult: AnalysisResult = {
-        taskDetected: true,
-        taskDescription: 'Review contract amendments for client Johnson & Co.',
-        confidence: 0.89,
-        specialist: 'Legal Researcher',
-        id: `task-${Date.now()}`
-      };
+    try {
+      // Check if there are any PDF files that haven't been processed yet
+      const pdfFiles = files.filter(file => file.type === 'application/pdf');
       
-      setAnalysisResult(mockResult);
+      if (pdfFiles.length > 0) {
+        setIsProcessingOCR(true);
+        
+        // Process each PDF file with OCR
+        for (const pdfFile of pdfFiles) {
+          console.log(`Processing PDF file during submit: ${pdfFile.name}`);
+          
+          try {
+            const response = await ocrAPI.extractTextFromPDF(pdfFile);
+            console.log('OCR response:', response);
+            
+            if (response.data && response.data.success) {
+              const extractedText = response.data.text;
+              
+              if (extractedText && extractedText.trim()) {
+                console.log(`Extracted ${extractedText.length} characters of text`);
+                
+                // Append the extracted text to the text input
+                setText(prevText => {
+                  const newText = prevText ?
+                    `${prevText}\n\n--- Extracted from ${pdfFile.name} ---\n${extractedText}` :
+                    `--- Extracted from ${pdfFile.name} ---\n${extractedText}`;
+                  return newText;
+                });
+              }
+            }
+          } catch (error) {
+            console.error(`Error processing ${pdfFile.name} during submit:`, error);
+          }
+        }
+        
+        setIsProcessingOCR(false);
+      }
+
+      // Simulate API call to backend
+      setTimeout(() => {
+        // Mock response
+        const mockResult: AnalysisResult = {
+          taskDetected: true,
+          taskDescription: 'Review contract amendments for client Johnson & Co.',
+          confidence: 0.89,
+          specialist: 'Legal Researcher',
+          id: `task-${Date.now()}`
+        };
+        
+        setAnalysisResult(mockResult);
+        setIsAnalyzing(false);
+      }, 2000);
+    } catch (error: any) {
+      console.error('Error during submission:', error);
       setIsAnalyzing(false);
-    }, 2000);
+      alert(`Error during submission: ${error?.message || 'Unknown error'}`);
+    }
   };
 
   const handleApprove = () => {
@@ -109,10 +194,11 @@ const Home: React.FC = () => {
     setAnalysisResult(null);
   };
 
-  const handleCaseCreated = (caseData: CaseData) => {
-    setCases([...cases, caseData]);
+  const handleCaseCreated = (/*caseData: CaseData*/) => {
+    setCases(casesAPI.getAllCases());
+    // setCases([...cases, caseData]);
     // In a real application, we would save this to the database
-    console.log('New case created:', caseData);
+    console.log('New case created:'/*, caseData*/);
   };
 
   return (
