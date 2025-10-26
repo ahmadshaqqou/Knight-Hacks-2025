@@ -3,7 +3,7 @@ from pymongo.server_api import ServerApi
 from dotenv import load_dotenv
 import os
 
-database_name = "DB"
+database_name = "db"
 
 
 def get_mongo_client():

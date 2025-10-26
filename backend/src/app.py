@@ -127,6 +127,7 @@ def get_user():
         user = get_lawyer(session_user['email'])
         if user is None:
             return jsonify({"error": "User does not exist in the database"}), 401
+        user['_id'] = str(user['_id'])
         return jsonify(user)
     return jsonify({"error": "Not authenticated"}), 401
 
