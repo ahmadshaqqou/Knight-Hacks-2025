@@ -3,15 +3,12 @@ import React, { useState, useEffect } from 'react';
 interface Task {
   id: string;
   taskDescription: string;
-  specialist: string;
   timestamp: string;
-  status: 'Pending' | 'Approved' | 'Completed';
 }
 
 const TaskHistory: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [activeFilter, setActiveFilter] = useState<string>('all');
 
   useEffect(() => {
     // Simulate API call to fetch task history
@@ -23,30 +20,32 @@ const TaskHistory: React.FC = () => {
         {
           id: 'task-1',
           taskDescription: 'Review contract amendments for client Johnson & Co.',
-          specialist: 'Legal Researcher',
-          timestamp: '2025-10-25T10:30:00Z',
-          status: 'Completed'
+          timestamp: '2025-10-25T10:30:00Z'
         },
         {
           id: 'task-2',
           taskDescription: 'Schedule client meeting with Sarah Williams',
-          specialist: 'Voice Bot Scheduler',
-          timestamp: '2025-10-24T14:15:00Z',
-          status: 'Completed'
+          timestamp: '2025-10-24T14:15:00Z'
         },
         {
           id: 'task-3',
           taskDescription: 'Organize evidence files for Martinez case',
-          specialist: 'Evidence Sorter',
-          timestamp: '2025-10-24T09:45:00Z',
-          status: 'Approved'
+          timestamp: '2025-10-24T09:45:00Z'
         },
         {
           id: 'task-4',
           taskDescription: 'Draft response to client inquiry about case status',
-          specialist: 'Client Communication Guru',
-          timestamp: '2025-10-23T16:20:00Z',
-          status: 'Pending'
+          timestamp: '2025-10-23T16:20:00Z'
+        },
+        {
+          id: 'task-5',
+          taskDescription: 'Research precedents for the Thompson lawsuit',
+          timestamp: '2025-10-22T11:20:00Z'
+        },
+        {
+          id: 'task-6',
+          taskDescription: 'Prepare documents for court filing deadline',
+          timestamp: '2025-10-21T15:45:00Z'
         }
       ];
       
@@ -70,48 +69,6 @@ const TaskHistory: React.FC = () => {
     });
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Completed':
-        return 'bg-green-100 text-green-800';
-      case 'Approved':
-        return 'bg-blue-100 text-blue-800';
-      case 'Pending':
-        return 'bg-yellow-100 text-yellow-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'Completed':
-        return (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
-        );
-      case 'Approved':
-        return (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        );
-      case 'Pending':
-        return (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        );
-      default:
-        return null;
-    }
-  };
-
-  const filteredTasks = activeFilter === 'all'
-    ? tasks
-    : tasks.filter(task => task.status.toLowerCase() === activeFilter);
-
   return (
     <div className="max-w-4xl mx-auto">
       <div className="text-center mb-10">
@@ -119,39 +76,6 @@ const TaskHistory: React.FC = () => {
         <p className="text-lg text-neutral-dark max-w-2xl mx-auto">
           View and track all your AI-processed legal tasks
         </p>
-      </div>
-      
-      <div className="mb-6 flex justify-center">
-        <div className="inline-flex rounded-md shadow-sm" role="group">
-          <button
-            type="button"
-            className={`px-4 py-2 text-sm font-medium border border-law-navy rounded-l-lg ${activeFilter === 'all' ? 'bg-law-navy text-white' : 'bg-white text-law-navy hover:bg-neutral-lightest'}`}
-            onClick={() => setActiveFilter('all')}
-          >
-            All Tasks
-          </button>
-          <button
-            type="button"
-            className={`px-4 py-2 text-sm font-medium border-t border-b border-r border-law-navy ${activeFilter === 'pending' ? 'bg-law-navy text-white' : 'bg-white text-law-navy hover:bg-neutral-lightest'}`}
-            onClick={() => setActiveFilter('pending')}
-          >
-            Pending
-          </button>
-          <button
-            type="button"
-            className={`px-4 py-2 text-sm font-medium border-t border-b border-r border-law-navy ${activeFilter === 'approved' ? 'bg-law-navy text-white' : 'bg-white text-law-navy hover:bg-neutral-lightest'}`}
-            onClick={() => setActiveFilter('approved')}
-          >
-            Approved
-          </button>
-          <button
-            type="button"
-            className={`px-4 py-2 text-sm font-medium border-t border-b border-r border-law-navy rounded-r-lg ${activeFilter === 'completed' ? 'bg-law-navy text-white' : 'bg-white text-law-navy hover:bg-neutral-lightest'}`}
-            onClick={() => setActiveFilter('completed')}
-          >
-            Completed
-          </button>
-        </div>
       </div>
       
       {isLoading ? (
@@ -162,7 +86,7 @@ const TaskHistory: React.FC = () => {
           </svg>
           <p className="text-lg text-neutral-dark">Loading task history...</p>
         </div>
-      ) : filteredTasks.length === 0 ? (
+      ) : tasks.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg shadow-card">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-neutral mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -178,33 +102,18 @@ const TaskHistory: React.FC = () => {
                   Task
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                  Specialist
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                   Date
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                  Status
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-neutral-light">
-              {filteredTasks.map((task) => (
+              {tasks.map((task) => (
                 <tr key={task.id} className="hover:bg-neutral-lightest transition-colors duration-150">
                   <td className="px-6 py-4 whitespace-normal">
                     <div className="text-sm font-medium text-neutral-darkest">{task.taskDescription}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-neutral-dark">{task.specialist}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-neutral-dark">{formatDate(task.timestamp)}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full ${getStatusColor(task.status)}`}>
-                      {getStatusIcon(task.status)}
-                      {task.status}
-                    </span>
                   </td>
                 </tr>
               ))}
