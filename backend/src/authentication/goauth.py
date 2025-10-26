@@ -70,6 +70,8 @@ def main():
         for event in events:
             start = event["start"].get("dateTime", event["start"].get("date"))
             print(start, event["summary"])
+
+        return creds
     
     except HttpError as error:
         print(f"An error occurred: {error}")
