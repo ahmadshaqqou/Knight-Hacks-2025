@@ -4,6 +4,7 @@ import FileUpload from '../../components/FileUpload/FileUpload';
 import AnalysisResults from '../../components/AnalysisResults/AnalysisResults';
 import HumanApproval from '../../components/HumanApproval/HumanApproval';
 import CreateCase from '../../components/CreateCase/CreateCase';
+import { tasksAPI } from '../../services/api';
 
 interface AnalysisResult {
   taskDetected: boolean;
@@ -27,6 +28,7 @@ const Home: React.FC = () => {
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [cases, setCases] = useState<CaseData[]>([]);
+  const [counter, setCounter] = useState<number>(1);
 
   const handleTextChange = (newText: string) => {
     setText(newText);
@@ -41,24 +43,65 @@ const Home: React.FC = () => {
       alert('Please enter text or upload files before submitting.');
       return;
     }
-
     setIsAnalyzing(true);
+    try {
+      // const res = await tasksAPI.analyzeContent({ text, files });
+      const res1 = await fetch(`http://localhost:8000/apps/chat_agent/users/u_123/sessions/s_${counter}`, {method: "POST"});
+      const res2 = await fetch(`http://localhost:8000/run`, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({
+          "appName": "chat_agent",
+          "user_id": "u_123",
+          "session_id": `s_${counter}`,
+          "new_message": {
+              "role": "user",
+              "parts": [
+                  {
+                      "text": text
+                  }
+              ]
+          }
+      })});
+      const resData = await res2.json();
+      setCounter(counter + 1);
+      let resText = "";
+      for (const data of resData) {
+        const parts = data.content.parts;
+        for (const part of parts) {
+          if (part.text && part.toString().trim().length > 0) {
+            resText += part.text + "\n";
+          }
+        }
+      }
 
-    // Simulate API call to backend
-    setTimeout(() => {
-      // Mock response
-      const mockResult: AnalysisResult = {
+      const dummmy = {
         taskDetected: true,
-        taskDescription: 'Review contract amendments for client Johnson & Co.',
-        confidence: 0.89,
-        specialist: 'Legal Researcher',
-        id: `task-${Date.now()}`
+        taskDescription: resText,
+        confidence: 1-Math.pow(Math.random(), 4),
+        specialist: "Scheduler",
+        id: "abc"
       };
-      
-      setAnalysisResult(mockResult);
+      setAnalysisResult(dummmy);
+    } catch (err) {
+      console.error('Analysis API error:', err);
+      alert('Failed to analyze content. Check backend logs.');
+    } finally {
       setIsAnalyzing(false);
-    }, 2000);
+    }
   };
+
+    // // Simulate API call to backend
+    // setTimeout(() => {
+    //   // Mock response
+    //   const mockResult: AnalysisResult = {
+      //   taskDetected: true,
+      //   taskDescription: 'Review contract amendments for client Johnson & Co.',
+      //   confidence: 0.89,
+      //   specialist: 'Legal Researcher',
+      //   id: `task-${Date.now()}`
+      // };
+
+    //   // setAnalysisResult(mockResult);
+    //   // setIsAnalyzing(false);
+    // }, 2000);
 
   const handleApprove = () => {
     if (!analysisResult) return;
@@ -82,6 +125,7 @@ const Home: React.FC = () => {
     // In a real application, we would save this to the database
     console.log('New case created:', caseData);
   };
+
 
   return (
     <div className="max-w-4xl mx-auto">

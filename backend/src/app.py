@@ -13,7 +13,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow, Flow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.oauth2 import id_token
-from google.auth.transport import requests as google_requests
+from google.auth.transport import requests as google_request
+
 
 # Load environment variables
 load_dotenv()
@@ -163,6 +164,7 @@ def verify_token():
     except Exception as e:
         print(f"Token verification error: {str(e)}")
         return jsonify({"valid": False, "error": str(e)}), 401
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=6767)

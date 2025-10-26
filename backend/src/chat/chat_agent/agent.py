@@ -505,6 +505,12 @@ General Instructions:
 - Prioritize clarity and correctness.
 """
 
+def list_events(max_results: int = 10):
+    now = datetime.datetime.now(tz=pytz.UTC).isoformat()
+    return search_events(time_min=now, max_results=max_results)
+
+
+
 root_agent = Agent(
     model=MODEL,
     name="google_calendar_agent",
