@@ -79,7 +79,7 @@ export const tasksAPI = {
       });
     }
     
-    return api.post('/api/tasks/analyze', formData, {
+    return api.post(`/api/tasks/analyze`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

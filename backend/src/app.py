@@ -19,6 +19,7 @@ from googleapiclient.errors import HttpError
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
+
 from util.db import *
 # Load environment variables
 load_dotenv()
@@ -276,6 +277,7 @@ def extract_text_from_pdf_endpoint():
             "error": error_message,
             "success": False
         }), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=6767)
