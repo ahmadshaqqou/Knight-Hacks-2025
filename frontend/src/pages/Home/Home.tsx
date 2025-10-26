@@ -109,10 +109,10 @@ const Home: React.FC = () => {
     setAnalysisResult(null);
   };
 
-  const handleCaseCreated = (caseData: CaseData) => {
-    setCases([...cases, caseData]);
+  const handleCaseCreated = (/*caseData: CaseData*/) => {
+    // setCases([...cases, caseData]);
     // In a real application, we would save this to the database
-    console.log('New case created:', caseData);
+    console.log('New case created:'/*, caseData*/);
   };
 
   return (
