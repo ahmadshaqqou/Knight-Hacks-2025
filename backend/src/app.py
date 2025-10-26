@@ -15,6 +15,7 @@ from googleapiclient.errors import HttpError
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
+from util.db import *
 # Load environment variables
 load_dotenv()
 
@@ -103,9 +104,12 @@ def authorize():
             'name': id_info.get('name'),
             'picture': id_info.get('picture')
         }
-    
-    print(credentials)
-    
+
+    session_user = session['user']
+    lawyer = get_lawyer(session_user['email'])
+    if lawyer is None:
+        create_lawyer(session_user['email'], session_user['name'], session_user['picture'])
+
     # Redirect to frontend with token
     return redirect(f"{FRONTEND_URL}?token={credentials.token}")
 
@@ -118,12 +122,15 @@ def logout():
 @app.route('/api/auth/user')
 def get_user():
     # Check if user is in session
-    user = session.get('user')
-    if user:
+    session_user = session.get('user')
+    if session_user:
+        user = get_lawyer(session_user['email'])
+        if user is None:
+            return jsonify({"error": "User does not exist in the database"}), 401
         return jsonify(user)
     return jsonify({"error": "Not authenticated"}), 401
 
-# @app.route('/api/auth/credentials')
+@app.route('/api/auth/credentials')
 def get_credentials():
     credentials = session.get('credentials')
     if credentials:

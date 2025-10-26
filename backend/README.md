@@ -9,6 +9,7 @@ This is the backend for the Tender for Lawyers application. It provides API endp
 - Python 3.8 or higher
 - pip (Python package manager)
 - A Google Cloud Platform account with OAuth 2.0 credentials
+- you are in the root backend directory 
 
 ### Installation
 
@@ -67,8 +68,7 @@ FRONTEND_URL= "http://localhost:3000"
 Start the Flask server:
 
 ```bash
-cd src
-python app.py
+python ./src/app.py
 ```
 
 The server will be available at http://localhost:5000.
