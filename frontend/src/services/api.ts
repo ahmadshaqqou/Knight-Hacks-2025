@@ -101,4 +101,19 @@ export const tasksAPI = {
   },
 };
 
+// OCR API
+export const ocrAPI = {
+  // Extract text from PDF
+  extractTextFromPDF: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    return api.post('/api/ocr/extract', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+};
+
 export default api;

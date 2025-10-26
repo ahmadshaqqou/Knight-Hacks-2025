@@ -7,6 +7,9 @@ from dotenv import load_dotenv
 from authentication.goauth import SCOPES
 import os.path
 from email_handler.email_client import email_client_runner
+import tempfile
+import werkzeug
+from util.ocr import extract_text_from_pdf, extract_text_from_pdf_bytes
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -206,6 +209,50 @@ def api_create_case():
     cases = get_cases(user['_id'])
     return jsonify(cases)
 
+
+@app.route('/api/ocr/extract', methods=['POST'])
+def extract_text_from_pdf_endpoint():
+    """
+    Extract text from a PDF file using OCR.
+    
+    Request:
+        - multipart/form-data with 'file' field containing the PDF file
+        
+    Response:
+        - JSON with 'text' field containing the extracted text
+    """
+    try:
+        # Check if the request has a file part
+        if 'file' not in request.files:
+            return jsonify({"error": "No file part"}), 400
+        
+        file = request.files['file']
+        
+        # Check if the file is empty
+        if file.filename == '':
+            return jsonify({"error": "No file selected"}), 400
+        
+        # Check if the file is a PDF
+        if not file.filename.lower().endswith('.pdf'):
+            return jsonify({"error": "File must be a PDF"}), 400
+        
+        # Create a temporary file
+        temp_dir = tempfile.mkdtemp()
+        temp_path = os.path.join(temp_dir, werkzeug.utils.secure_filename(file.filename))
+        file.save(temp_path)
+        
+        # Extract text from the PDF
+        text = extract_text_from_pdf(temp_path)
+        
+        # Clean up
+        os.remove(temp_path)
+        os.rmdir(temp_dir)
+        
+        return jsonify({"text": text})
+    
+    except Exception as e:
+        print(f"Error extracting text from PDF: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=6767)

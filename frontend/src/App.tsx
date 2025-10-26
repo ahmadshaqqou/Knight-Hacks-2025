@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home/Home';
 import TaskHistoryPage from './pages/TaskHistory/TaskHistory';
+import Email from './pages/Email/Email';
 import Login from './pages/Login/Login';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
@@ -52,6 +53,7 @@ const AppContent = () => {
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/history" element={<TaskHistoryPage />} />
+                  <Route path="/email" element={<Email />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </main>
