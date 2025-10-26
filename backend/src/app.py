@@ -17,7 +17,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow, Flow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.oauth2 import id_token
-from google.auth.transport import requests as google_request
+from google.auth.transport import requests as google_requests
 
 
 from util.db import *
