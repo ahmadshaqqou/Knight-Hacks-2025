@@ -1,22 +1,16 @@
 import React, { useState } from 'react';
+import { casesAPI } from '../../services/api';
 
 interface CreateCaseProps {
-  onCaseCreated?: (caseData: CaseData) => void;
-}
-
-interface CaseData {
-  id: string;
-  name: string;
-  caseNumber?: string;
-  summary: string;
-  createdAt: Date;
+  onCaseCreated?: (/*caseData: */) => void;
 }
 
 const CreateCase: React.FC<CreateCaseProps> = ({ onCaseCreated }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [caseName, setCaseName] = useState('');
-  const [caseNumber, setCaseNumber] = useState('');
   const [caseSummary, setCaseSummary] = useState('');
+  const [clientName, setClientName] = useState('');
+  const [clientEmail, setClientEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{
     name?: string;
@@ -34,8 +28,9 @@ const CreateCase: React.FC<CreateCaseProps> = ({ onCaseCreated }) => {
 
   const resetForm = () => {
     setCaseName('');
-    setCaseNumber('');
     setCaseSummary('');
+    setClientName('');
+    setClientEmail('');
     setErrors({});
   };
 
@@ -50,6 +45,16 @@ const CreateCase: React.FC<CreateCaseProps> = ({ onCaseCreated }) => {
 
     if (!caseSummary.trim()) {
       newErrors.summary = 'Case summary is required';
+      isValid = false;
+    }
+
+    if (!clientName.trim()) {
+      newErrors.summary = 'Client name is required';
+      isValid = false;
+    }
+
+    if (!clientEmail.trim()) {
+      newErrors.summary = 'Client email is required';
       isValid = false;
     }
 
@@ -68,16 +73,18 @@ const CreateCase: React.FC<CreateCaseProps> = ({ onCaseCreated }) => {
 
     // Simulate API call to create case
     setTimeout(() => {
-      const newCase: CaseData = {
-        id: `case-${Date.now()}`,
-        name: caseName,
-        caseNumber: caseNumber || undefined,
-        summary: caseSummary,
-        createdAt: new Date(),
-      };
+      // const newCase: CaseData = {
+      //   id: `case-${Date.now()}`,
+      //   name: caseName,
+      //   caseNumber: caseNumber || undefined,
+      //   summary: caseSummary,
+      //   createdAt: new Date(),
+      // };
+
+      casesAPI.createCase({"case_name": caseName, "case_summary": caseSummary, "client_name": clientName, "client_email": clientEmail});
 
       if (onCaseCreated) {
-        onCaseCreated(newCase);
+        onCaseCreated();
       }
 
       setIsSubmitting(false);
@@ -129,21 +136,7 @@ const CreateCase: React.FC<CreateCaseProps> = ({ onCaseCreated }) => {
                 />
                 {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name}</p>}
               </div>
-              
-              <div className="mb-4">
-                <label htmlFor="caseNumber" className="block text-sm font-medium text-neutral-dark mb-1">
-                  Case Number <span className="text-neutral">(Optional)</span>
-                </label>
-                <input
-                  id="caseNumber"
-                  type="text"
-                  value={caseNumber}
-                  onChange={(e) => setCaseNumber(e.target.value)}
-                  className="w-full px-3 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-2 focus:ring-law-navy"
-                  placeholder="Enter case number (optional)"
-                />
-              </div>
-              
+
               <div className="mb-6">
                 <label htmlFor="caseSummary" className="block text-sm font-medium text-neutral-dark mb-1">
                   Case Summary <span className="text-red-500">*</span>
@@ -159,6 +152,40 @@ const CreateCase: React.FC<CreateCaseProps> = ({ onCaseCreated }) => {
                   placeholder="Enter case summary"
                 ></textarea>
                 {errors.summary && <p className="mt-1 text-sm text-red-500">{errors.summary}</p>}
+              </div>
+              
+              <div className="mb-4">
+                <label htmlFor="clientName" className="block text-sm font-medium text-neutral-dark mb-1">
+                  Client Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="clientName"
+                  type="text"
+                  value={clientName}
+                  onChange={(e) => setClientName(e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-law-navy ${
+                    errors.name ? 'border-red-500' : 'border-neutral-light'
+                  }`}
+                  placeholder="Enter client name"
+                />
+                {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name}</p>}
+              </div>
+              
+              <div className="mb-4">
+                <label htmlFor="clientEmail" className="block text-sm font-medium text-neutral-dark mb-1">
+                  Client Email <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="clientEmail"
+                  type="text"
+                  value={clientEmail}
+                  onChange={(e) => setClientEmail(e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-law-navy ${
+                    errors.name ? 'border-red-500' : 'border-neutral-light'
+                  }`}
+                  placeholder="Enter client email"
+                />
+                {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name}</p>}
               </div>
               
               <div className="flex justify-end space-x-3">

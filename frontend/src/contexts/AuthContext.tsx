@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { authAPI } from '../services/api';
 
 interface User {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   picture?: string;
