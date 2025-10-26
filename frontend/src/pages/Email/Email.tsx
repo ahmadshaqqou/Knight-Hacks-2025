@@ -1,3 +1,4 @@
+import { randomInt } from 'crypto';
 import React, { useState, useEffect } from 'react';
 
 // Define types for our data
@@ -25,6 +26,9 @@ const Email: React.FC = () => {
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
   const [emails, setEmails] = useState<Email[]>([]);
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
+  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState<boolean>(false);
+  const [aiError, setAiError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   // Mock data for cases
@@ -65,7 +69,7 @@ const Email: React.FC = () => {
       
       // In a real application, this would be an API call
       setTimeout(() => {
-        const mockEmails: Email[] = [
+        /*const mockEmails: Email[] = [
           {
             id: `email-${selectedCaseId}-1`,
             subject: 'Initial consultation follow-up',
@@ -107,9 +111,23 @@ const Email: React.FC = () => {
             read: false
           }
         ];
-        
-        setEmails(mockEmails);
-        setLoading(false);
+        */
+       let mockEmails: Email[] = [];
+       let idx = 0;
+        fetch('http://localhost:6767/api/email', {"credentials": "include"}) 
+          .then(response => {
+            if(!response.ok){
+              throw new Error("Error fetching from API");
+            }
+            return response.json();
+          })
+          .then(data => {
+            data['emails'].forEach((element: any) => {
+              mockEmails.push({id : `${element.gmail_id}`, subject : `${element.subject}`, sender : `${element.sender}`, recipient : `${element.to}`, content : `${element.body_text}`, date : new Date(element.date), caseId : selectedCaseId, read : false});
+            });
+            setEmails(mockEmails);
+            setLoading(false);
+          })
       }, 500);
     } else {
       setEmails([]);
@@ -138,6 +156,10 @@ const Email: React.FC = () => {
   // Handle email selection
   const handleEmailSelect = (email: Email) => {
     setSelectedEmail(email);
+    // Clear any previous AI summary when switching emails
+    setAiSummary(null);
+    setAiError(null);
+    setAiLoading(false);
     
     // Mark email as read if it wasn't already
     if (!email.read) {
@@ -145,6 +167,83 @@ const Email: React.FC = () => {
         e.id === email.id ? { ...e, read: true } : e
       );
       setEmails(updatedEmails);
+    }
+  };
+
+  // Generate AI summary for the selected email by calling the AI endpoint
+  const generateAiSummary = async () => {
+    if (!selectedEmail) return;
+
+    setAiLoading(true);
+    setAiError(null);
+    setAiSummary(null);
+
+    // ASSUMPTION: the AI summary endpoint is hosted locally. Update this URL
+    // to your real endpoint or move into configuration as needed.
+    const generate_rand_session = Math.floor(Math.random() * 1000);
+    const AGENT = 'emailagent';
+    const AI_ENDPOINT_INIT = `http://localhost:8000/apps/${AGENT}/users/u_123/sessions/s_${generate_rand_session}`;
+    const AI_ENDPOINT = `http://localhost:8000/run`;
+    
+    // Session creation endpoint
+    try {
+      const session_init = await fetch(AI_ENDPOINT_INIT, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    } catch (err: any) {
+      return setAiError('Failed to initialize AI session');
+    }
+
+    // Main endpoint
+    try {
+      const res = await fetch(AI_ENDPOINT, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "appName": AGENT,
+          "user_id": 'u_123',
+          "session_id": `s_${generate_rand_session.toString()}`,
+          "new_message": {
+          "role": "user",
+          "parts": [
+              {
+                  "text": `Summarize the following email content in a concise manner, highlighting key points and action items:\n\n${selectedEmail.content}`,
+              }
+          ]
+      }
+        })
+      });
+
+      if (!res.ok) {
+        const txt = await res.text().catch(() => '');
+        throw new Error(txt || `AI API returned status ${res.status}`);
+      }
+
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const json = await res.json();
+        // Try common field names, fallback to raw stringify
+        //const summary = json.summary || json.result || json.data || JSON.stringify(json);
+        setAiSummary(json[0]["content"]["parts"][0]["text"]);
+      } else {
+        const text = await res.text();
+        let output_text = JSON.parse(text);
+       
+         output_text = output_text[0]["content"]["parts"][0]["text"];
+
+        setAiSummary(output_text);
+      }
+    } catch (err: any) {
+      setAiError(err?.message || 'Failed to generate AI summary');
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -253,13 +352,45 @@ const Email: React.FC = () => {
                 
                 <div className="border-t border-neutral-light p-3 bg-neutral-lightest">
                   <div className="flex justify-end space-x-2">
-                    <button className="px-3 py-1 bg-law-navy text-white rounded hover:bg-law-blue transition-colors duration-200 text-sm">
-                      Reply
+                    <button
+                      onClick={generateAiSummary}
+                      disabled={aiLoading}
+                      className="px-3 py-1 bg-law-navy text-white rounded hover:bg-law-blue transition-colors duration-200 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {aiLoading ? (
+                        <span className="inline-flex items-center space-x-2">
+                          <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          <span>Generating...</span>
+                        </span>
+                      ) : (
+                        'Generate AI Summary'
+                      )}
                     </button>
                     <button className="px-3 py-1 bg-white border border-neutral-light text-neutral-dark rounded hover:bg-neutral-lightest transition-colors duration-200 text-sm">
                       Forward
                     </button>
                   </div>
+                  
+                </div>
+                <div className="p-5 flex-grow overflow-y-auto">
+                  {aiLoading ? (
+                    <div className="text-center text-neutral">
+                      <svg className="animate-spin h-8 w-8 mx-auto mb-3 text-law-navy" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <div>Generating AI summary...</div>
+                    </div>
+                  ) : aiError ? (
+                    <div className="text-sm text-red-600">Error generating summary: {aiError}</div>
+                  ) : aiSummary ? (
+                    <div className="whitespace-pre-line text-neutral-dark">{aiSummary}</div>
+                  ) : (
+                    <div className="text-neutral">AI summary will appear here. Click "Generate AI Summary" to create one for the selected email.</div>
+                  )}
                 </div>
               </div>
             ) : (

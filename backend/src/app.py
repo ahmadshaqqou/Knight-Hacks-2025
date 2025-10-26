@@ -144,7 +144,7 @@ def get_credentials():
 
 @app.route('/api/email')
 def get_emails():
-    sender = 'mailer-daemon@googlemail.com'
+    sender = os.getenv("EMAIL_ADDRESS")
     start_date = '12/5/2024'
     credentials = get_credentials()
     return jsonify(email_client_runner(credentials, sender, start_date))
