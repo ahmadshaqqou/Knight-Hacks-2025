@@ -132,6 +132,8 @@ def get_user():
         if user is None:
             return jsonify({"error": "User does not exist in the database"}), 401
         user['_id'] = str(user['_id'])
+        for i in range(len(user['cases'])):
+            user['cases'][i] = str(user['cases'][i])
         return jsonify(user)
     return jsonify({"error": "Not authenticated"}), 401
 
@@ -207,6 +209,9 @@ def api_create_case():
         return jsonify({"error": "User does not exist in the database"}), 401
     create_case(user['_id'], data["case_name"], data["case_summary"], data["client_name"], data["client_email"])
     cases = get_cases(user['_id'])
+    for case in cases:
+        case['_id'] = str(case['_id'])
+        case['user_id'] = str(case['user_id'])
     return jsonify(cases)
 
 
@@ -222,37 +227,55 @@ def extract_text_from_pdf_endpoint():
         - JSON with 'text' field containing the extracted text
     """
     try:
+        print("OCR extract endpoint called")
+        
         # Check if the request has a file part
         if 'file' not in request.files:
+            print("No file part in request")
             return jsonify({"error": "No file part"}), 400
         
         file = request.files['file']
+        print(f"Received file: {file.filename}")
         
         # Check if the file is empty
         if file.filename == '':
+            print("Empty filename")
             return jsonify({"error": "No file selected"}), 400
         
         # Check if the file is a PDF
         if not file.filename.lower().endswith('.pdf'):
+            print(f"Not a PDF file: {file.filename}")
             return jsonify({"error": "File must be a PDF"}), 400
         
-        # Create a temporary file
-        temp_dir = tempfile.mkdtemp()
-        temp_path = os.path.join(temp_dir, werkzeug.utils.secure_filename(file.filename))
+        # Create a temporary file with a proper name
+        fd, temp_path = tempfile.mkstemp(suffix='.pdf')
+        os.close(fd)
         file.save(temp_path)
+        
+        print(f"Saved file to temporary path: {temp_path}")
         
         # Extract text from the PDF
         text = extract_text_from_pdf(temp_path)
         
         # Clean up
         os.remove(temp_path)
-        os.rmdir(temp_dir)
+        print(f"Removed temporary file: {temp_path}")
         
-        return jsonify({"text": text})
+        print(f"Extracted text length: {len(text)}")
+        
+        return jsonify({
+            "text": text,
+            "filename": file.filename,
+            "success": True
+        })
     
     except Exception as e:
-        print(f"Error extracting text from PDF: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        error_message = f"Error extracting text from PDF: {str(e)}"
+        print(error_message)
+        return jsonify({
+            "error": error_message,
+            "success": False
+        }), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=6767)

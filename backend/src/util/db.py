@@ -88,9 +88,9 @@ def create_case(user_id: str, case_name: str, case_summary: str, client_name: st
             "emails": []
         })
         lawyers_collection = get_lawyers_collection(client)
-        lawyer = lawyers_collection.find_one({"user_id": ObjectId(user_id)})
+        lawyer = lawyers_collection.find_one({"_id": ObjectId(user_id)})
         if lawyer is not None:
-            lawyers_collection.update_one({"_id": ObjectId(user_id)}, {"$push": {"cases": db_res.inserted_id}})
+            lawyers_collection.update_one({"_id": lawyer['_id']}, {"$push": {"cases": db_res.inserted_id}})
         client.close()
     except Exception as e:
         print("create_case")
@@ -112,7 +112,7 @@ def get_cases(user_id: str):
     try:
         client = get_mongo_client()
         collection = get_cases_collection(client)
-        cases = list(collection.find({"_id": ObjectId(user_id)}))
+        cases = list(collection.find({"user_id": ObjectId(user_id)}))
         client.close()
         return cases
     except Exception as e:

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { CaseData } from '../pages/Home/Home';
 
 // Use the backend API URL
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:6767';
@@ -55,8 +56,8 @@ export const casesAPI = {
   },
 
   // Get all cases
-  getAllCases: () => {
-    return api.get('/api/cases');
+  getAllCases: (): CaseData[] => {
+    return api.get('/api/cases') as unknown as CaseData[];
   },
 
   // Get a specific case

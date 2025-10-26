@@ -2,15 +2,7 @@ import React, { useState } from 'react';
 import { casesAPI } from '../../services/api';
 
 interface CreateCaseProps {
-  onCaseCreated?: (caseData: CaseData) => void;
-}
-
-interface CaseData {
-  _id: string;
-  case_name: string;
-  case_summary: string;
-  client_name: string;
-  client_email: string;
+  onCaseCreated?: (/*caseData: */) => void;
 }
 
 const CreateCase: React.FC<CreateCaseProps> = ({ onCaseCreated }) => {
