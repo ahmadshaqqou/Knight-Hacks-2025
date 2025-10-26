@@ -179,6 +179,33 @@ def verify_token():
     except Exception as e:
         print(f"Token verification error: {str(e)}")
         return jsonify({"valid": False, "error": str(e)}), 401
+    
+@app.route('/api/cases')
+def api_get_cases():
+    session_user = session.get('user')
+    if session_user is None:
+        return jsonify({"error": "Not authenticated"}), 401
+    user = get_lawyer(session_user['email'])
+    if user is None:
+        return jsonify({"error": "User does not exist in the database"}), 401
+    cases = get_cases(user['_id'])
+    return jsonify(cases)
+
+@app.route('/api/cases', methods=['POST'])
+def api_create_case():
+    data = request.json
+    if not data["case_name"] or not data["case_summary"] or not data["client_name"] or not data["client_email"]:
+        return jsonify({"error": "Bad request JSON"}), 400
+    session_user = session.get('user')
+    if session_user is None:
+        return jsonify({"error": "Not authenticated"}), 401
+    user = get_lawyer(session_user['email'])
+    if user is None:
+        return jsonify({"error": "User does not exist in the database"}), 401
+    create_case(user['_id'], data["case_name"], data["case_summary"], data["client_name"], data["client_email"])
+    cases = get_cases(user['_id'])
+    return jsonify(cases)
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=6767)
