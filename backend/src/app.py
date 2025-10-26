@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from authentication.goauth import SCOPES
 import os.path
+from email_handler.email_client import email_client_runner
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -129,6 +130,13 @@ def get_credentials():
     if credentials:
         return credentials
     return None
+
+@app.route('/api/email')
+def get_emails():
+    sender = 'mailer-daemon@googlemail.com'
+    start_date = '12/5/2024'
+    credentials = get_credentials()
+    return jsonify(email_client_runner(credentials, sender, start_date))
 
 @app.route('/api/auth/verify-token', methods=['POST'])
 def verify_token():
